@@ -1,2 +1,0 @@
-# partes
-partes de trabajo
