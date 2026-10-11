@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#176b52">
+<title>Mis horas de trabajo</title>
+<style>
+:root{--green:#176b52;--green2:#e7f4ee;--ink:#17231f;--muted:#68756f;--line:#dce5e0;--bg:#f5f7f6;--white:#fff;--red:#b42318}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+header{background:var(--green);color:#fff;padding:22px 18px 20px;border-radius:0 0 22px 22px}
+header .eyebrow{font-size:12px;opacity:.82;text-transform:uppercase;letter-spacing:.1em}h1{font-size:25px;margin:6px 0 4px}header p{margin:0;font-size:14px;opacity:.9}
+main{max-width:720px;margin:auto;padding:16px 14px 40px}.tabs{display:flex;gap:8px;margin:0 0 14px}.tab{flex:1;border:1px solid var(--line);background:#fff;border-radius:12px;padding:11px 7px;font-weight:650;color:var(--muted)}.tab.active{background:var(--green2);border-color:#9bcbb7;color:var(--green)}
+.card{background:var(--white);border:1px solid var(--line);border-radius:17px;padding:16px;margin-bottom:14px;box-shadow:0 2px 8px #13271c08}.card h2{font-size:18px;margin:0 0 13px}.label{display:block;font-size:13px;color:var(--muted);font-weight:650;margin:12px 0 6px}
+input,select,textarea{font:inherit;width:100%;border:1px solid #cfdad4;border-radius:11px;padding:12px;background:#fff;color:var(--ink);min-height:46px}textarea{min-height:92px;resize:vertical}
+button{font:inherit;font-weight:700;border:0;border-radius:12px;padding:13px 15px;cursor:pointer;min-height:46px}.primary{background:var(--green);color:#fff}.secondary{background:var(--green2);color:var(--green)}.outline{background:#fff;border:1px solid var(--line);color:var(--ink)}.danger{background:#fff0ef;color:var(--red);border:1px solid #f1c4c0}.full{width:100%;margin-top:12px}.row{display:flex;gap:9px}.row>*{flex:1;min-width:0}
+.timer{text-align:center;background:linear-gradient(160deg,#f3faf6,#fff);border:1px solid #cfe5d9;border-radius:16px;padding:18px 10px;margin-top:14px}.timer small{color:var(--muted);font-weight:650;letter-spacing:.08em}.clock{font-size:clamp(35px,10vw,49px);font-weight:750;letter-spacing:-.04em;font-variant-numeric:tabular-nums;margin:5px 0;color:var(--green)}.status{font-size:13px;color:var(--muted)}.hidden{display:none!important}
+.item{padding:13px 0;border-top:1px solid var(--line)}.item:first-child{border-top:0}.itemtop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.item h3{font-size:15px;margin:0 0 4px}.meta{font-size:13px;color:var(--muted);line-height:1.5}.duration{white-space:nowrap;font-weight:750;color:var(--green)}.desc{margin-top:7px;font-size:14px;white-space:pre-wrap}.pill{display:inline-block;font-size:11px;padding:4px 8px;border-radius:20px;background:#edf1ef;color:#4d5b54;margin-top:5px}
+.empty{text-align:center;color:var(--muted);padding:20px 8px;font-size:14px}.note{font-size:12px;line-height:1.5;color:var(--muted)}.section-title{display:flex;justify-content:space-between;align-items:center;gap:8px}.section-title h2{margin:0}.smallbtn{min-height:36px;padding:8px 10px;font-size:13px}
+.total{font-size:23px;font-weight:800;color:var(--green)}.filterrow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.filterrow select{flex:1;min-width:130px}.message{padding:10px 12px;background:#fff7e6;border:1px solid #f2d79d;border-radius:10px;font-size:13px;line-height:1.45;margin-bottom:12px}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:5px 20px 22px}
+</style>
+</head>
+<body>
+<header><div class="eyebrow">Control horario personal</div><h1>Mis horas de trabajo</h1><p>Un registro independiente por cada visita a la obra.</p></header>
+<main>
+<div class="message">Tus datos se guardan en este iPhone, en este navegador. Exporta una copia de seguridad con regularidad para no perderlos.</div>
+<nav class="tabs" aria-label="Secciones">
+<button class="tab active" data-tab="registro">Cronómetro</button><button class="tab" data-tab="historial">Historial</button><button class="tab" data-tab="gestion">Clientes y obras</button>
+</nav>
+<section id="registro">
+<div class="card">
+<h2>Nueva sesión</h2>
+<label class="label" for="clientSelect">Cliente</label><select id="clientSelect"><option value="">Selecciona un cliente</option></select>
+<label class="label" for="workSelect">Obra</label><select id="workSelect" disabled><option value="">Selecciona una obra</option></select>
+<div class="timer"><small id="timerLabel">LISTO PARA EMPEZAR</small><div class="clock" id="clock">00:00:00</div><div class="status" id="timerStatus">El tiempo empieza al pulsar Inicio.</div></div>
+<div class="row" id="timerButtons"><button class="primary" id="startBtn">▶ INICIO</button><button class="danger" id="finishBtn" disabled>■ FINALIZAR</button></div>
+<p class="note" style="margin-bottom:0">Al finalizar, podrás describir el trabajo realizado antes de guardar la sesión. Cada visita se guarda por separado, aunque sea la misma obra.</p>
+</div>
+<div class="card hidden" id="finishCard">
+<h2>Describe el trabajo realizado</h2>
+<div class="meta" id="finishSummary"></div>
+<label class="label" for="description">Trabajo realizado</label>
+<textarea id="description" placeholder="Ej.: Instalación de tuberías en el baño..." maxlength="1500"></textarea>
+<div class="row"><button class="outline" id="cancelFinish">Volver</button><button class="primary" id="saveSession">Guardar sesión</button></div>
+</div>
+</section>
+<section id="historial" class="hidden">
+<div class="card">
+<div class="section-title"><h2>Historial de sesiones</h2><span class="total" id="sessionCount">0</span></div>
+<div class="filterrow" style="margin-top:14px"><select id="filterClient"><option value="">Todos los clientes</option></select><select id="filterWork"><option value="">Todas las obras</option></select></div>
+<div class="meta" id="historySummary">0 sesiones guardadas</div>
+<div id="historyList" style="margin-top:10px"></div>
+</div>
+</section>
+<section id="gestion" class="hidden">
+<div class="card">
+<h2>Añadir cliente</h2><label class="label" for="newClient">Nombre del cliente</label><input id="newClient" placeholder="Ej.: Juan García" maxlength="120">
+<button class="primary full" id="addClient">Guardar cliente</button>
+<div id="clientList" style="margin-top:10px"></div>
+</div>
+<div class="card">
+<h2>Añadir obra</h2><label class="label" for="workClient">Cliente</label><select id="workClient"><option value="">Selecciona un cliente</option></select>
+<label class="label" for="newWork">Nombre o dirección de la obra</label><input id="newWork" placeholder="Ej.: Reforma de cocina" maxlength="160">
+<button class="primary full" id="addWork">Guardar obra</button>
+<div id="workList" style="margin-top:10px"></div>
+</div>
+<div class="card">
+<h2>Copias de seguridad</h2><p class="note">Exporta todos tus clientes, obras y sesiones a un archivo JSON. Guarda el archivo en Archivos, iCloud Drive o envíatelo a ti mismo. También puedes exportar el historial a CSV para abrirlo con Excel.</p>
+<div class="row"><button class="secondary" id="backupBtn">Copia JSON</button><button class="outline" id="csvBtn">Exportar CSV</button></div>
+<label class="label" for="restoreFile">Restaurar copia JSON</label><input id="restoreFile" type="file" accept=".json,application/json">
+<p class="note">Restaurar una copia sustituye los datos actuales de esta aplicación. Haz una copia primero si necesitas conservarlos.</p>
+</div>
+</section>
+</main>
+<footer>Los registros se guardan localmente en este navegador del iPhone.</footer>
+<script>
+(function(){
+const KEY='misHorasTrabajo_v1';
+const $=id=>document.getElementById(id);
+let data={clients:[],works:[],sessions:[],active:null};
+let pending=null, tick=null;
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
+function load(){try{const x=JSON.parse(localStorage.getItem(KEY));if(x&&Array.isArray(x.clients)&&Array.isArray(x.works)&&Array.isArray(x.sessions))data={...data,...x}}catch(e){}}
+function persist(){localStorage.setItem(KEY,JSON.stringify(data))}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function clientName(id){return data.clients.find(x=>x.id===id)?.name||'Cliente eliminado'}
+function workName(id){return data.works.find(x=>x.id===id)?.name||'Obra eliminada'}
+function fmt(ms){let s=Math.max(0,Math.floor(ms/1000)),h=Math.floor(s/3600),m=Math.floor(s%3600/60),sec=s%60;return [h,m,sec].map(n=>String(n).padStart(2,'0')).join(':')}
+function duration(ms){let mins=Math.max(0,Math.round(ms/60000)),h=Math.floor(mins/60),m=mins%60;return h?`${h} h ${String(m).padStart(2,'0')} min`:`${m} min`}
+function dateFmt(v){return new Date(v).toLocaleString('es-ES',{dateStyle:'medium',timeStyle:'short'})}
+function options(select,items,placeholder,selected=''){select.innerHTML=`<option value="">${esc(placeholder)}</option>`+items.map(x=>`<option value="${esc(x.id)}" ${x.id===selected?'selected':''}>${esc(x.name)}</option>`).join('')}
+function renderSelects(){
+const oldC=$('clientSelect').value,oldW=$('workSelect').value;
+options($('clientSelect'),data.clients,'Selecciona un cliente',oldC);
+const client=$('clientSelect').value;
+options($('workSelect'),data.works.filter(w=>w.clientId===client),'Selecciona una obra',oldW);
+$('workSelect').disabled=!client||!!data.active;
+options($('workClient'),data.clients,'Selecciona un cliente');
+options($('filterClient'),[{id:'',name:'Todos los clientes'},...data.clients],'Todos los clientes',$('filterClient').value);
+renderFilterWorks();
+}
+function renderFilterWorks(){
+const c=$('filterClient').value,old=$('filterWork').value;
+const works=data.works.filter(w=>!c||w.clientId===c);
+options($('filterWork'),[{id:'',name:'Todas las obras'},...works],'Todas las obras',works.some(w=>w.id===old)?old:'');
+}
+function updateTimer(){
+if(!data.active){$('clock').textContent='00:00:00';$('timerLabel').textContent='LISTO PARA EMPEZAR';$('timerStatus').textContent='El tiempo empieza al pulsar Inicio.';return}
+const ms=Date.now()-data.active.start;$('clock').textContent=fmt(ms);$('timerLabel').textContent='SESIÓN EN CURSO';$('timerStatus').textContent=clientName(data.active.clientId)+' · '+workName(data.active.workId);
+}
+function renderActive(){
+const a=!!data.active;
+$('startBtn').disabled=a||!$('clientSelect').value||!$('workSelect').value;
+$('finishBtn').disabled=!a;
+$('clientSelect').disabled=a;$('workSelect').disabled=a;
+if(a){$('clientSelect').value=data.active.clientId;options($('workSelect'),data.works.filter(w=>w.clientId===data.active.clientId),'Selecciona una obra',data.active.workId)}
+updateTimer();
+}
+function renderHistory(){
+const c=$('filterClient').value,w=$('filterWork').value;
+const arr=data.sessions.filter(s=>(!c||s.clientId===c)&&(!w||s.workId===w)).sort((a,b)=>b.start-a.start);
+$('sessionCount').textContent=arr.length;$('historySummary').textContent=`${arr.length} ${arr.length===1?'sesión guardada':'sesiones guardadas'} · Total mostrado: ${duration(arr.reduce((n,s)=>n+s.durationMs,0))}`;
+$('historyList').innerHTML=arr.length?arr.map(s=>`<div class="item"><div class="itemtop"><div><h3>${esc(clientName(s.clientId))} · ${esc(workName(s.workId))}</h3><div class="meta">${esc(dateFmt(s.start))}</div></div><div class="duration">${esc(duration(s.durationMs))}</div></div><div class="desc">${esc(s.description||'Sin descripción')}</div><div class="row" style="margin-top:9px"><button class="outline smallbtn" data-edit="${esc(s.id)}">Editar</button><button class="danger smallbtn" data-delete="${esc(s.id)}">Eliminar</button></div></div>`).join(''):'<div class="empty">Todavía no hay sesiones guardadas.</div>';
+$('historyList').querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>{if(confirm('¿Eliminar esta sesión?')){data.sessions=data.sessions.filter(s=>s.id!==b.dataset.delete);persist();renderHistory()}});
+$('historyList').querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>editSession(b.dataset.edit));
+}
+function editSession(id){const s=data.sessions.find(x=>x.id===id);if(!s)return;const d=prompt('Descripción del trabajo realizado:',s.description);if(d===null)return;s.description=d.trim();persist();renderHistory()}
+function renderManagement(){
+$('clientList').innerHTML=data.clients.length?data.clients.map(c=>`<div class="item"><div class="itemtop"><div><h3>${esc(c.name)}</h3><div class="meta">${data.works.filter(w=>w.clientId===c.id).length} obras</div></div><button class="danger smallbtn" data-del-client="${esc(c.id)}">Eliminar</button></div></div>`).join(''):'<div class="empty">Añade tu primer cliente.</div>';
+$('workList').innerHTML=data.works.length?data.works.map(w=>`<div class="item"><div class="itemtop"><div><h3>${esc(w.name)}</h3><div class="meta">${esc(clientName(w.clientId))}</div></div><button class="danger smallbtn" data-del-work="${esc(w.id)}">Eliminar</button></div></div>`).join(''):'<div class="empty">Añade tu primera obra.</div>';
+$('clientList').querySelectorAll('[data-del-client]').forEach(b=>b.onclick=()=>{const id=b.dataset.delClient;if(data.active?.clientId===id){alert('No puedes eliminar un cliente con una sesión activa.');return}if(confirm('Eliminar este cliente y sus obras? Las sesiones anteriores se conservarán en el historial.')){data.clients=data.clients.filter(c=>c.id!==id);data.works=data.works.filter(w=>w.clientId!==id);persist();renderAll()}});
+$('workList').querySelectorAll('[data-del-work]').forEach(b=>b.onclick=()=>{const id=b.dataset.delWork;if(data.active?.workId===id){alert('No puedes eliminar una obra con una sesión activa.');return}if(confirm('¿Eliminar esta obra? Las sesiones anteriores se conservarán en el historial.')){data.works=data.works.filter(w=>w.id!==id);persist();renderAll()}});
+}
+function renderAll(){renderSelects();renderActive();renderHistory();renderManagement()}
+function showTab(name){document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));['registro','historial','gestion'].forEach(id=>$(id).classList.toggle('hidden',id!==name))}
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
+$('clientSelect').addEventListener('change',()=>{renderSelects();renderActive()});
+$('workSelect').addEventListener('change',renderActive);
+$('startBtn').onclick=()=>{if(data.active)return;if(!$('clientSelect').value||!$('workSelect').value){alert('Selecciona primero un cliente y una obra.');return}data.active={id:uid(),clientId:$('clientSelect').value,workId:$('workSelect').value,start:Date.now()};persist();renderActive();if(tick)clearInterval(tick);tick=setInterval(updateTimer,1000)};
+$('finishBtn').onclick=()=>{if(!data.active)return;pending={...data.active,end:Date.now(),durationMs:Date.now()-data.active.start};$('finishSummary').textContent=`${clientName(pending.clientId)} · ${workName(pending.workId)} · ${duration(pending.durationMs)}`;$('description').value='';$('finishCard').classList.remove('hidden');$('description').focus();$('finishBtn').disabled=true};
+$('cancelFinish').onclick=()=>{$('finishCard').classList.add('hidden');pending=null;renderActive()};
+$('saveSession').onclick=()=>{if(!pending)return;const desc=$('description').value.trim();if(!desc){alert('Escribe qué trabajo has realizado antes de guardar.');$('description').focus();return}data.sessions.push({id:pending.id,clientId:pending.clientId,workId:pending.workId,start:pending.start,end:pending.end,durationMs:pending.durationMs,description:desc});data.active=null;pending=null;persist();$('finishCard').classList.add('hidden');if(tick)clearInterval(tick);renderAll();showTab('historial')};
+$('addClient').onclick=()=>{const name=$('newClient').value.trim();if(!name){alert('Escribe el nombre del cliente.');return}data.clients.push({id:uid(),name});$('newClient').value='';persist();renderAll()};
+$('addWork').onclick=()=>{const clientId=$('workClient').value,name=$('newWork').value.trim();if(!clientId||!name){alert('Selecciona un cliente y escribe el nombre de la obra.');return}data.works.push({id:uid(),clientId,name});$('newWork').value='';persist();renderAll()};
+$('filterClient').onchange=()=>{renderFilterWorks();renderHistory()};$('filterWork').onchange=renderHistory;
+function download(name,content,type){const blob=new Blob([content],{type}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500)}
+$('backupBtn').onclick=()=>download('copia-mis-horas-'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(data,null,2),'application/json');
+$('csvBtn').onclick=()=>{const rows=[['Fecha','Cliente','Obra','Duración (minutos)','Trabajo realizado'],...data.sessions.slice().sort((a,b)=>a.start-b.start).map(s=>[dateFmt(s.start),clientName(s.clientId),workName(s.workId),Math.round(s.durationMs/60000),s.description])];const csv=rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')).join('\r\n');download('historial-mis-horas-'+new Date().toISOString().slice(0,10)+'.csv','\ufeff'+csv,'text/csv;charset=utf-8')};
+$('restoreFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const x=JSON.parse(await f.text());if(!Array.isArray(x.clients)||!Array.isArray(x.works)||!Array.isArray(x.sessions))throw Error();if(!confirm('Esto sustituirá todos los datos actuales por los de la copia. ¿Continuar?'))return;data={clients:x.clients,works:x.works,sessions:x.sessions,active:x.active||null};persist();renderAll();if(data.active){tick=setInterval(updateTimer,1000)}alert('Copia restaurada.')}catch(err){alert('No se pudo leer la copia. Selecciona un archivo JSON válido exportado desde esta aplicación.')}finally{e.target.value=''}};
+load();renderAll();if(data.active){tick=setInterval(updateTimer,1000)}
+})();
+</script>
+</body>
+</html>
